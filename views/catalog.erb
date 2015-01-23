@@ -1,0 +1,16 @@
+<% @current = CLIENT.user(@user.uid) %>
+<h1><%= @current.screen_name %></h1>
+<p>Favorites: <%= @current.favourites_count %></p>
+<p>Name: <%= @current.name %></p>
+<p>Id: <%= @user.uid %></p>
+Tweets: <%= @user.tweets.length %>
+<ol>
+  <% @user.tweets.each do |tweet| %>
+    <li>
+      <p><%= tweet.uid %></p>
+      <p><%= tweet.text %></p>
+      <p><%= tweet.username %> (@<%= tweet.screenname %>), <%= tweet.created_at %></p>
+      <p><a href="https://twitter.com/<%= tweet.screenname %>/status/<%= tweet.uid %>">Link</a></p>
+    </li>
+  <% end %>
+</ol>

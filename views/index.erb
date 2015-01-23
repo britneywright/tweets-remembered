@@ -1,0 +1,25 @@
+<div ng-controller='TweetListController'>
+  <h1>Welcome to Tweets Remembered</h1>
+  <select ng-model="query.archived">
+   <option value="false">Active Tweets</option>
+   <option value="true">Archived Tweets</option>
+</select>
+  <br>
+  Tweets: {{tweets.length | filter: query}}
+  <ul class="tweets">
+      <li ng-repeat="tweet in tweets | filter: query">
+        <p>
+          <input type="checkbox" ng-model="tweet.archived" ng-change="updateTweet(tweet)">
+          {{tweet.text}}
+        </p>
+        <p>{{tweet.username}} ({{tweet.screenname}}), <a href="https://twitter.com/{{tweet.screenname}}/status/{{tweet.uid_string}}">{{tweet.created_at| date:"MM/dd/yyyy @ h:mma" }}</a></p>
+        <input type="checkbox" ng-model="tagList"><ul><li class="tags" ng-repeat="tag in tweet.tags">{{tag.name}}</li></ul>
+        <div ng-show="tagList">
+          <form>
+          <input type="text" ng-model="tweet.tag_list">
+          <input type="submit" value="Submit" ng-click="updateTweet(tweet)">
+          </form>
+        </div>  
+      </li>
+  </ul>
+</div>  
