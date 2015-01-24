@@ -60,27 +60,30 @@ class User < ActiveRecord::Base
   attr_accessor :tag_list 
 
   def fetch_tweets
-    fave_count = self.tweets.length
-    if self.tweets.length == 0
-      tweet_params({:count => 200})
-      fetch_tweets
+    if self.tweets.count == 0
+      all_tweets
     else
-      smallest = self.tweets.minimum(:uid)
-      tweet_params({:count => 200, :max_id => (smallest - 1)})
-      tweet_params({:count => 200, :since_id => self.tweets.maximum(:uid)})
-      if fave_count == self.tweets.length
-        return
-      else
-        fetch_tweets
-      end
+      recent_tweets
     end
   end
 
-  # def fetch_tweets
-  #   tweet_params({:count => 200})
-  # end  
+  def all_tweets
+    initial_count = self.tweets.count
+    smallest_id = self.tweets.minimum(:uid)
+    params = {count: 200}
+    params[:max_id] = smallest_id - 1 if smallest_id
+    tweet_params(params)
+    return if initial_count == self.tweets.count
+    all_tweets 
+  end
 
-  def tag_list=(names)
+  def recent_tweets
+    smallest_id = self.tweets.minimum(:uid)
+    tweet_params({:count => 200, :max_id => (smallest_id - 1)})  
+    tweet_params({:count => 200, :since_id => self.tweets.maximum(:uid)})
+  end  
+
+  def tag_list
     tags.map(&:name).join(", ")
   end
 
@@ -91,7 +94,7 @@ class User < ActiveRecord::Base
   end
 
   def tweet_params(query_options)
-    CLIENT.favorites(self.uid,options=query_options).each do |tweet|
+    CLIENT.favorites(self.uid,query_options).each do |tweet|
       self.tweets.push(Tweet.create_with(:text => tweet.text, :username => tweet.user.name, :screenname => tweet.user.screen_name, :created_at => tweet.created_at, :user_id => self.id).find_or_create_by(:uid => tweet.id))
     end
   end 
@@ -146,19 +149,6 @@ get '/users' do
   erb :users
 end
 
-get '/catalog' do
-  halt(401,'Not Authorized') unless current_user?
-  @user = User.find_by(:uid => session[:uid])
-  @user.fetch_tweets
-  redirect to("/")
-  erb :catalog
-end
-
-post '/catalog' do
-  @user = find_or_create_by_uid
-  @user.fetch_tweets
-end
-
 get '/tags' do
   @tags = User.first(:uid => session[:uid]).tags
   erb :"tags/index"
@@ -188,21 +178,6 @@ get '/tweets/:id' do
   @tweet.to_json(:methods => [:tags,:tag_list,:uid_string])
 end
 
-#PUT - Updates existing tweet
-# put '/tweets/:id' do
-#   @tweet = Tweet.get(params[:id].to_i)
-#   if @tweet.archived == true
-#     @tweet.update(:archived => false)
-#   else
-#     @tweet.update(:archived => true)
-#   end
-#   if @tweet.save
-#     @tweet.to_json
-#   else
-#     halt 500
-#   end
-# end
-
 put '/tweets/:id' do
   begin
     params.merge! JSON.parse(request.env["rack.input"].read)
@@ -219,14 +194,16 @@ end
 
 get '/login' do
   redirect to("/auth/twitter") unless current_user?
-  @user = find_or_create_by_uid
-  redirect to("/catalog")
+  @user = User.find_by(:uid => session[:uid])
+  @user.fetch_tweets
+  redirect to("/")
 end
 
 get '/auth/twitter/callback' do
   session[:uid] = env['omniauth.auth']['uid']
-  @user = find_or_create_by_uid
-  redirect to("/catalog")
+  @user = User.find_by(:uid => session[:uid])
+  @user.fetch_tweets
+  redirect to("/")
 end
 
 get '/auth/failure' do
