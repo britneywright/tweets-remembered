@@ -89,7 +89,7 @@ class User < ActiveRecord::Base
 
   def tag_list=(names)
     self.tags = names.split(",").map do |n|
-      Tag.first_or_create(:name => n.strip, :user_id => self.id)
+      Tag.find_or_create_by(:name => n.strip, :user_id => self.id)
     end
   end
 
@@ -102,7 +102,7 @@ end
 
 class Tag < ActiveRecord::Base
   belongs_to :user
-  has_many :tweets, :through => :user
+  has_and_belongs_to_many :tweets
   before_save :to_slug
 
   def to_slug
@@ -112,7 +112,7 @@ end
 
 class Tweet < ActiveRecord::Base
   belongs_to :user
-  has_many :tags, :through => :user
+  has_and_belongs_to_many :tags
 
   attr_accessor :tag_list
 
@@ -122,7 +122,7 @@ class Tweet < ActiveRecord::Base
 
   def tag_list=(names)
     self.tags = names.split(",").map do |n|
-      Tag.first_or_create(:name => n.strip, :user_id => self.user_id)
+      Tag.find_or_create_by(:name => n.strip, :user_id => self.user_id)
     end
   end
 
@@ -150,14 +150,19 @@ get '/users' do
 end
 
 get '/tags' do
-  @tags = User.first(:uid => session[:uid]).tags
+  @tags = User.find_by(:uid => session[:uid]).tags
   erb :"tags/index"
+end
+
+get '/tags/:slug' do
+  @tag = User.find_by(:uid => session[:uid]).tags.find_by(:slug => params[:slug])
+  erb :"tags/show"
 end
 
 #GET Returns all tweets
 get '/tweets' do
   @tweets = User.find_by(:uid => session[:uid]).tweets.order('uid DESC')
-  @tweets.to_json(:methods => [:tags,:tag_list,:uid_string])
+  @tweets.to_json(:methods => [:tags,:tag_list])
 end
 
 
@@ -175,7 +180,7 @@ end
 #GET - Returns single post
 get '/tweets/:id' do
   @tweet = Tweet.get(params[:id])
-  @tweet.to_json(:methods => [:tags,:tag_list,:uid_string])
+  @tweet.to_json(:methods => [:tags,:tag_list])
 end
 
 put '/tweets/:id' do
@@ -201,7 +206,7 @@ end
 
 get '/auth/twitter/callback' do
   session[:uid] = env['omniauth.auth']['uid']
-  @user = User.find_by(:uid => session[:uid])
+  @user = find_or_create_by_uid
   @user.fetch_tweets
   redirect to("/")
 end
