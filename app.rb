@@ -151,18 +151,19 @@ end
 
 get '/tags' do
   @tags = User.find_by(:uid => session[:uid]).tags
-  erb :"tags/index"
+  @tags.to_json(:methods => [:tweets])
 end
 
 get '/tags/:slug' do
   @tag = User.find_by(:uid => session[:uid]).tags.find_by(:slug => params[:slug])
+  @tag.to_json(:methods => [:tweets])
   erb :"tags/show"
 end
 
 #GET Returns all tweets
 get '/tweets' do
   @tweets = User.find_by(:uid => session[:uid]).tweets.order('uid DESC')
-  @tweets.to_json(:methods => [:tags,:tag_list])
+  @tweets.to_json(:methods => [:tags,:tag_list,:uid_string])
 end
 
 
@@ -177,10 +178,9 @@ get '/tweets/:id/show' do
   erb :"tweet/show"
 end
 
-#GET - Returns single post
 get '/tweets/:id' do
   @tweet = Tweet.get(params[:id])
-  @tweet.to_json(:methods => [:tags,:tag_list])
+  @tweet.to_json(:methods => [:tags,:tag_list,:uid_string])
 end
 
 put '/tweets/:id' do
