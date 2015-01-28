@@ -154,6 +154,12 @@ get '/tags' do
   @tags.to_json(:methods => [:tweets])
 end
 
+# get '/tags/:id' do
+#   @tag = Tag.find(params[:id])
+#   @tag.to_json(:methods => [:tweets])
+#   erb :"tags/show"
+# end
+
 get '/tags/:slug' do
   @tag = User.find_by(:uid => session[:uid]).tags.find_by(:slug => params[:slug])
   @tag.to_json(:methods => [:tweets])
@@ -179,7 +185,7 @@ get '/tweets/:id/show' do
 end
 
 get '/tweets/:id' do
-  @tweet = Tweet.get(params[:id])
+  @tweet = Tweet.find_by(:id => params[:id])
   @tweet.to_json(:methods => [:tags,:tag_list,:uid_string])
 end
 
