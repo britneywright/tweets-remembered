@@ -121,8 +121,10 @@ class Tweet < ActiveRecord::Base
   end
 
   def tag_list=(names)
+    while names != nil
     self.tags = names.split(",").map do |n|
       Tag.find_or_create_by(:name => n.strip, :user_id => self.user_id)
+    end
     end
   end
 
@@ -145,8 +147,8 @@ get '/' do
 end
 
 get '/users' do
-  @users = User.all
-  erb :users
+  @user = User.find_by(:uid => session[:uid])
+  @user.to_json(:methods => [:tweets,:tags,:tag_list,:uid_string])
 end
 
 get '/tags' do
@@ -182,6 +184,11 @@ end
 get '/tweets/:id/show' do
   @tweet = Tweet.get(params[:id])
   erb :"tweet/show"
+end
+
+get '/users/:uid' do
+  @user = User.find_by(:uid => session[:uid])
+  @user.to_json(:methods => [:tags,:tag_list,:tweets])
 end
 
 get '/tweets/:id' do

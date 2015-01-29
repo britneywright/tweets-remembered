@@ -1,25 +1,26 @@
 <div ng-controller='TweetListController'>
-  <h1>Welcome to Tweets Remembered</h1>
-  <select ng-model="query.archived">
-   <option value="false">Active Tweets</option>
-   <option value="true">Archived Tweets</option>
-</select>
-  <br>
-  Tweets: {{tweets.length | filter: query}}
-  <ul class="tweets">
-      <li ng-repeat="tweet in tweets | filter: query">
-        <p>
-          <input type="checkbox" ng-model="tweet.archived" ng-change="updateTweet(tweet)">
-          {{tweet.text}}
+  <p>{{user.id}}</p>
+  <li ng-repeat="tag in user.tags">{{tag.name}}</li>
+<!-- <select ng-model="query.archived"> -->
+<!--  <option value="false">Active Tweets</option> -->
+<!--  <option value="true">Archived Tweets</option> -->
+<!-- </select> -->
+<!--   <br> -->
+<ul class="tweets">
+<li ng-repeat="tweet in user.tweets | filter: query">
+<p>
+<input type="checkbox" ng-model="tweet.archived" ng-change="updateTweet(tweet)">
+{{tweet.text}}
         </p>
-        <p>{{tweet.username}} ({{tweet.screenname}}), <a href="https://twitter.com/{{tweet.screenname}}/status/{{tweet.uid_string}}">{{tweet.created_at| date:"MM/dd/yyyy @ h:mma" }}</a></p>
-        <input type="checkbox" ng-model="tagList"><ul><li class="tags" ng-repeat="tag in tweet.tags">{{tag.name}}</li></ul>
+        <p>{{tweet.username}} ({{tweet.screenname}}), <a ng-href="https://twitter.com/{{tweet.screenname}}/status/{{tweet.uid_string}}">{{tweet.created_at| date:"MM/dd/yyyy @ h:mma" }}</a></p>
+        <p><a href="" ng-click="tagList = ! tagList">Tags</a></p>
+        <ul><li class="tags" ng-repeat="tag in tweet.tags"><a ng-href="/tags/{{tag.slug}}">{{tag.name}}</a></li></ul>
         <div ng-show="tagList">
           <form>
           <input type="text" ng-model="tweet.tag_list">
           <input type="submit" value="Submit" ng-click="updateTweet(tweet)">
           </form>
-        </div>  
+        </div> 
       </li>
   </ul>
 </div>  

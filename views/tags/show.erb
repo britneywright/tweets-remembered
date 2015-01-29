@@ -1,0 +1,8 @@
+<div ng-controller="TagDetailController">
+  <h1><%= @tag.name %></h1>
+  <ul>
+    <% @tag.tweets.each do |t| %>
+      <li><%= t.text %></li>
+    <% end %>
+  </ul>
+</div>
