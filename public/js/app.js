@@ -14,7 +14,7 @@ faveTweets.controller('TweetListController', ['$scope','$routeParams','Tweet','U
 }]);
 
 faveTweets.factory('Tweet',['$resource',function($resource){
-  return $resource('/tweets/:id',{},{
+  return $resource('/tweets/:id',{id: '@id'},{
     update: {method: 'PUT'}
   });
 }]);

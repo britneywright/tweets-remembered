@@ -121,10 +121,8 @@ class Tweet < ActiveRecord::Base
   end
 
   def tag_list=(names)
-    while names != nil
     self.tags = names.split(",").map do |n|
       Tag.find_or_create_by(:name => n.strip, :user_id => self.user_id)
-    end
     end
   end
 
