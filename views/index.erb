@@ -1,13 +1,11 @@
 <div ng-controller='TweetListController'>
-  <p>{{user.id}}</p>
+  <p>{{user.tweets.length}}</p>
   <li ng-repeat="tag in user.tags">{{tag.name}}</li>
-<!-- <select ng-model="query.archived"> -->
-<!--  <option value="false">Active Tweets</option> -->
-<!--  <option value="true">Archived Tweets</option> -->
-<!-- </select> -->
-<!--   <br> -->
+ <select ng-init="query.archived = stages[0].value" ng-model="query.archived" ng-options="stage.value as stage.label for stage in stages">
+</select>
+<br>
 <ul class="tweets">
-<li ng-repeat="tweet in user.tweets | filter: query">
+<li ng-repeat="tweet in user.tweets | orderBy:uid_string:reverse | filter: query">
 <p>
 <input type="checkbox" ng-model="tweet.archived" ng-change="updateTweet(tweet)">
 {{tweet.text}}

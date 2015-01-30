@@ -95,7 +95,7 @@ class User < ActiveRecord::Base
 
   def tweet_params(query_options)
     CLIENT.favorites(self.uid,query_options).each do |tweet|
-      self.tweets.push(Tweet.create_with(:text => tweet.text, :username => tweet.user.name, :screenname => tweet.user.screen_name, :created_at => tweet.created_at, :user_id => self.id).find_or_create_by(:uid => tweet.id))
+      self.tweets.push(Tweet.create_with(:text => tweet.text, :username => tweet.user.name, :screenname => tweet.user.screen_name, :created_at => tweet.created_at, :user_id => self.id, :uid_string => tweet.id.to_s).find_or_create_by(:uid => tweet.id))
     end
   end 
 end
@@ -132,9 +132,6 @@ class Tweet < ActiveRecord::Base
     Tag.first(:slug => slug).tweets
   end
 
-  def uid_string
-    uid.to_s
-  end
 end
 
 get '/' do
@@ -148,7 +145,7 @@ end
 
 get '/users' do
   @user = User.find_by(:uid => session[:uid])
-  @user.to_json(:methods => [:tweets,:tags,:tag_list,:uid_string])
+  @user.to_json(:methods => [:tweets,:tags,:tag_list])
 end
 
 get '/tags' do
@@ -171,7 +168,7 @@ end
 #GET Returns all tweets
 get '/tweets' do
   @tweets = User.find_by(:uid => session[:uid]).tweets.order('uid DESC')
-  @tweets.to_json(:methods => [:tags,:tag_list,:uid_string])
+  @tweets.to_json(:methods => [:tags,:tag_list])
 end
 
 
@@ -193,7 +190,7 @@ end
 
 get '/tweets/:id' do
   @tweet = Tweet.find_by(:id => params[:id])
-  @tweet.to_json(:methods => [:tags,:tag_list,:uid_string])
+  @tweet.to_json(:methods => [:tags,:tag_list])
 end
 
 put '/tweets/:id' do

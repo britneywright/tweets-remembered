@@ -5,8 +5,12 @@ faveTweets.controller('TweetListController', ['$scope','$routeParams','Tweet','U
     $scope.user = User.get();
     $scope.updateTweet = function(tweet){
       var entry = Tweet.get({id: tweet.id});
-      entry.$update();
+      entry.$update(tweet);
     };
+    $scope.stages = [
+    {label: 'Active', value: false},
+    {label: 'Archived', value: true}
+  ];
 }]);
 
 //faveTweets.controller('TagDetailController', ['$scope','$routeParams', 'Tag', function($scope,$routeParams,Tag) {
@@ -14,7 +18,7 @@ faveTweets.controller('TweetListController', ['$scope','$routeParams','Tweet','U
 //}]);
 
 faveTweets.factory('Tweet',['$resource',function($resource){
-  return $resource('/tweets/:id',{id: '@id'},{
+  return $resource('/tweets/:id',{},{
     update: {method: 'PUT'}
   });
 }]);

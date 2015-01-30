@@ -7,6 +7,7 @@ class CreateTweets < ActiveRecord::Migration
       t.string :screenname
       t.boolean :archived, :default => false
       t.belongs_to :user
+      t.text :uid_string
       t.datetime :created_at
       t.datetime :updated_at
     end
