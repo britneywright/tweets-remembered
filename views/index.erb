@@ -1,24 +1,27 @@
 <div ng-controller='TweetListController'>
-  <p>{{user.tweets.length}}</p>
-  <li ng-repeat="tag in user.tags">{{tag.name}}</li>
- <select ng-init="query.archived = stages[0].value" ng-model="query.archived" ng-options="stage.value as stage.label for stage in stages">
-</select>
-<br>
-<ul class="tweets">
-<li ng-repeat="tweet in user.tweets | orderBy:uid_string:reverse | filter: query">
-<p>
-<input type="checkbox" ng-model="tweet.archived" ng-change="updateTweet(tweet)">
-{{tweet.text}}
-        </p>
+  <div class="sidebar">
+    <p>{{user.tweets.length}}</p>
+    <li><span ng-click="query = null">all tweets</span></li>
+     <li><span ng-click="query.archived = false">Active</span></li>
+     <li><span ng-click="query.archived = true">Archived</span></li>
+     <li ng-repeat="tag in user.tags"><span ng-click="$parent.query.tags = tag.name">{{tag.name}}</span> - {{tag.tweets.length}}</li>
+  </div>
+  <div class="main">
+    <ul class="tweets">
+      <li ng-repeat="tweet in user.tweets | orderBy:-uid_string | filter: query">
+        <p><input type="checkbox" ng-model="tweet.archived" ng-change="updateTweet(tweet)">{{tweet.text}}</p>
         <p>{{tweet.username}} ({{tweet.screenname}}), <a ng-href="https://twitter.com/{{tweet.screenname}}/status/{{tweet.uid_string}}">{{tweet.created_at| date:"MM/dd/yyyy @ h:mma" }}</a></p>
         <p><a href="" ng-click="tagList = ! tagList">Tags</a></p>
-        <ul><li class="tags" ng-repeat="tag in tweet.tags"><a ng-href="/tags/{{tag.slug}}">{{tag.name}}</a></li></ul>
+        <ul>
+          <li class="tags" ng-repeat="tag in tweet.tags"><a ng-href="/tags/{{tag.slug}}">{{tag.name}}</a></li>
+        </ul>
         <div ng-show="tagList">
           <form>
-          <input type="text" ng-model="tweet.tag_list">
-          <input type="submit" value="Submit" ng-click="updateTweet(tweet)">
+            <input type="text" ng-model="tweet.tag_list">
+            <input type="submit" value="Submit" ng-click="updateTweet(tweet)">
           </form>
         </div> 
       </li>
-  </ul>
+    </ul>
+  </div>  
 </div>  
