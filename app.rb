@@ -143,7 +143,7 @@ end
 
 get '/users' do
   @user = User.find_by(:uid => session[:uid])
-  @user.to_json(:include => [:tags, { :tweets => { :include => :tags, :methods => :tag_list }  }],:methods => :tag_list )
+  @user.to_json(:include => [{:tags => {:include => :tweets}}, { :tweets => { :include => :tags, :methods => :tag_list }  }],:methods => :tag_list )
 
 end
 
