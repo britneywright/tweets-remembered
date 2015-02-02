@@ -1,18 +1,31 @@
-<div ng-controller='TweetListController'>
+<div class="main" ng-controller='TweetListController'>
   <div class="sidebar">
-    <p>{{user.tweets.length}}</p>
-    <li><span ng-click="query = null">all tweets</span></li>
-     <li><span ng-click="query.archived = false">Active</span></li>
-     <li><span ng-click="query.archived = true">Archived</span></li>
-     <li ng-repeat="tag in user.tags"><span ng-click="$parent.query.tags = tag.name">{{tag.name}}</span> - {{tag.tweets.length}}</li>
-  </div>
-  <div class="main">
+    <p>Filter Tweets {{user.tweets.length}}</p>
+    <div class="tweetStatus">
+      <span class="filterTitle">Status:</h3>
+      <select ng-model="query">
+        <option ng-model="query" value="">All Tweets</option>
+        <option ng-model="query.archived" value="false">Active Tweets</option>
+        <option ng-model="query.archived" value="true">Archived Tweets</option>
+      </select>
+    </div>
+    <div class="userTags">  
+      <span class="filterTitle">Tags:</h3>
+        <select ng-model="$parent.query.tags" ng-options="tag.name for tag in tags">
+            <option ng-model="query" value="">--choose tag--</option>
+        </select>
+      </div>     
+<!--      <li ng-repeat="tag in user.tags">
+     <label><input type="checkbox" ng-model="$parent.query.tags" ng-true-value="{{tag.name}}">{{tag.name}}</label>
+     </li> -->
+    </div>
+  <div class="tweetList">
     <ul class="tweets">
       <li ng-repeat="tweet in user.tweets | orderBy:-uid_string | filter: query">
         <p><input type="checkbox" ng-model="tweet.archived" ng-change="updateTweet(tweet)">{{tweet.text}}</p>
         <p>{{tweet.username}} ({{tweet.screenname}}), <a ng-href="https://twitter.com/{{tweet.screenname}}/status/{{tweet.uid_string}}">{{tweet.created_at| date:"MM/dd/yyyy @ h:mma" }}</a></p>
         <p><a href="" ng-click="tagList = ! tagList">Tags</a></p>
-        <ul>
+        <ul class = "tweetTags">
           <li class="tags" ng-repeat="tag in tweet.tags"><a ng-href="/tags/{{tag.slug}}">{{tag.name}}</a></li>
         </ul>
         <div ng-show="tagList">

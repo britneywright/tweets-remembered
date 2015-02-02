@@ -1,0 +1,28 @@
+.main {
+  color: #333;
+  display: flex;
+}
+
+.sidebar {
+  flex: 1;
+  max-width: 250px;
+}
+
+.tweetList {
+  flex: 2;
+}
+
+.tweetTags {
+  list-style: none;
+}
+
+.tags {
+  display: inline;
+  padding: 5px;
+  background-color: #432;
+  border-radius: 3px;
+}
+
+.tweetTags li {
+  display: inline;
+}

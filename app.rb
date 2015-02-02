@@ -3,7 +3,7 @@ require 'sinatra/activerecord'
 require 'twitter'
 require 'omniauth-twitter'
 require 'json'
-
+require 'sass'
 
 configure do
   enable :sessions
